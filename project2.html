@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Calculator</title>
+<style>
+body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding:50px;}
+h1{color:#38bdf8;}
+#calculator{display:inline-block;background:#1e293b;padding:20px;border-radius:10px;}
+#display{width:220px;padding:10px;font-size:20px;margin-bottom:10px;text-align:right;border:none;border-radius:5px;}
+button{width:50px;height:50px;margin:5px;font-size:18px;border:none;border-radius:5px;background:#38bdf8;color:white;cursor:pointer;transition:0.2s;}
+button:hover{transform:scale(1.1);}
+.special{background:#f97316;}
+</style>
+</head>
+<body>
+
+<h1>Advanced Calculator</h1>
+<div id="calculator">
+<input type="text" id="display" readonly>
+<br>
+<button onclick="append('7')">7</button>
+<button onclick="append('8')">8</button>
+<button onclick="append('9')">9</button>
+<button onclick="append('/')">÷</button>
+<br>
+<button onclick="append('4')">4</button>
+<button onclick="append('5')">5</button>
+<button onclick="append('6')">6</button>
+<button onclick="append('*')">×</button>
+<br>
+<button onclick="append('1')">1</button>
+<button onclick="append('2')">2</button>
+<button onclick="append('3')">3</button>
+<button onclick="append('-')">−</button>
+<br>
+<button onclick="append('0')">0</button>
+<button onclick="append('.')">.</button>
+<button onclick="calculate()">=</button>
+<button onclick="append('+')">+</button>
+<br>
+<button onclick="clearDisplay()" class="special">C</button>
+<button onclick="sqrtCalc()" class="special">√</button>
+<button onclick="percentCalc()" class="special">%</button>
+<button onclick="backspace()" class="special">⌫</button>
+</div>
+
+<br><br>
+<a href="index.html" style="color:#38bdf8;font-weight:bold;">Back to Home</a>
+
+<script>
+function append(val){
+    document.getElementById('display').value += val;
+}
+
+function clearDisplay(){
+    document.getElementById('display').value='';
+}
+
+function backspace(){
+    let d=document.getElementById('display').value;
+    document.getElementById('display').value = d.slice(0,-1);
+}
+
+function calculate(){
+    let d=document.getElementById('display').value;
+    if(d.includes('%')){
+        let parts=d.split('%');
+        d=Number(parts[0])/100*Number(parts[1]||1);
+    }
+    try{
+        let result=eval(d);
+        document.getElementById('display').value=result;
+    }catch(err){
+        document.getElementById('display').value='Error';
+    }
+}
+
+function sqrtCalc(){
+    let d=document.getElementById('display').value;
+    try{
+        let result=Math.sqrt(eval(d));
+        document.getElementById('display').value=result;
+    }catch(err){
+        document.getElementById('display').value='Error';
+    }
+}
+
+function percentCalc(){
+    let d=document.getElementById('display').value;
+    try{
+        let result=eval(d)/100;
+        document.getElementById('display').value=result;
+    }catch(err){
+        document.getElementById('display').value='Error';
+    }
+}
+</script>
+
+</body>
+</html>

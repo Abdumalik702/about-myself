@@ -1,441 +1,302 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Abdumalik — Portfolio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdumalik Portfolio</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
 
-  <style>
-    /* Basic page */
-    :root{
-      --accent: #00bcd4;
-      --card-bg: rgba(30,30,30,0.85);
-      --card-border: rgba(80,80,80,0.6);
-      --text-primary: #f3f4f6;
-      --text-muted: #d0d4d8;
-      --bg-dark: #07080a;
-    }
-    html,body { height:100%; }
-    body {
-      margin:0;
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: var(--bg-dark);
-      color: var(--text-primary);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      overflow-x:hidden;
-    }
+        /* Анимированный фон с пузырьками */
+        .background {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
 
-    /* Canvas background occupies full viewport, behind content */
-    canvas#bg {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      display:block;
-    }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(56, 189, 248, 0.15);
+            animation: move 20s linear infinite;
+            bottom: -300px;
+        }
 
-    /* Navbar */
-    .navbar {
-      z-index: 5;
-      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35));
-      backdrop-filter: blur(6px);
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-    }
-    .navbar-brand { font-weight:700; color:var(--text-primary) !important; }
-    .nav-link { color:var(--text-muted) !important; }
-    .nav-link:hover { color:var(--text-primary) !important; }
+        .circle:nth-child(1) { width: 200px; height: 200px; left: 10%; animation-duration: 25s; }
+        .circle:nth-child(2) { width: 150px; height: 150px; left: 40%; animation-duration: 18s; animation-delay: 2s; }
+        .circle:nth-child(3) { width: 300px; height: 300px; left: 70%; animation-duration: 30s; }
+        .circle:nth-child(4) { width: 120px; height: 120px; left: 85%; animation-duration: 22s; animation-delay: 5s; }
+        .circle:nth-child(5) { width: 250px; height: 250px; left: 55%; animation-duration: 28s; }
 
-    /* Sections */
-    section { position:relative; z-index:2; padding:80px 0; }
-    .container { max-width:1100px; }
+        @keyframes move {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
 
-    h1,h2{ color:var(--text-primary); font-weight:700; }
-    h2{ margin-bottom:18px; position:relative; display:inline-block; }
-    h2::after{
-      content:"";
-      position:absolute;
-      left:0; bottom:-10px;
-      width:60px; height:3px;
-      background:var(--accent);
-      border-radius:3px;
-    }
-    p { color:var(--text-muted); line-height:1.6; }
+        /* Навигация */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-    /* Cards */
-    .card.custom-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius:14px;
-      overflow:hidden;
-      transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
-    }
-    .card.custom-card .card-body { padding:18px; }
-    .card.custom-card img { width:100%; height:190px; object-fit:cover; display:block; }
-    .card.custom-card:hover{
-      transform: translateY(-8px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-      border-color: rgba(0,188,212,0.85);
-    }
-    .card-title { color:#ffffff; font-weight:600; }
-    .card-text { color: #e1e5e8; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: white; text-decoration: none; font-size: 14px; transition: 0.3s; opacity: 0.8; }
+        .nav-links a:hover { opacity: 1; color: #38bdf8; }
 
-    /* small controls area */
-    .lang-select {
-      min-width:90px;
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.06);
-      color:var(--text-primary);
-    }
+        .controls { display: flex; align-items: center; gap: 10px; }
 
-    /* fade-up animation utility */
-    .fade-up {
-      opacity:0;
-      transform: translateY(20px);
-      transition: opacity .7s ease, transform .7s ease;
-    }
-    .fade-up.visible {
-      opacity:1;
-      transform: translateY(0);
-    }
+        .lang button, .pdf-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: bold;
+            transition: 0.3s;
+        }
 
-    /* footer */
-    footer {
-      z-index:2;
-      padding:24px 0;
-      text-align:center;
-      color: #9aa3a6;
-      border-top: 1px solid rgba(255,255,255,0.03);
-    }
+        .pdf-btn { background: #f8fafc; color: #0f172a; }
+        .lang button:hover, .pdf-btn:hover { transform: scale(1.05); opacity: 0.9; }
 
-    /* responsive spacing */
-    @media (max-width:768px){
-      section { padding:60px 0; }
-      .card.custom-card img { height:160px; }
-    }
-  </style>
+        /* Контейнер */
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 120px 20px 40px;
+            text-align: center;
+        }
+
+        h1 { font-size: clamp(32px, 5vw, 48px); margin-bottom: 10px; color: #38bdf8; }
+        section { margin-top: 80px; scroll-margin-top: 100px; }
+        h2 { font-size: 28px; border-bottom: 2px solid #38bdf8; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
+        p { line-height: 1.8; color: #cbd5e1; font-size: 18px; }
+
+        /* SKILLS */
+        .skills { max-width: 600px; margin: 30px auto; }
+        .skill { margin-bottom: 20px; text-align: left; }
+        .bar { width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .progress { height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 10px; transition: 1s ease-in-out; }
+
+        /* PROJECTS */
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .project {
+            background: rgba(255,255,255,0.03);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
+        .project:hover {
+            transform: translateY(-10px);
+            background: rgba(56, 189, 248, 0.1);
+            border-color: #38bdf8;
+        }
+        .project button {
+            margin-top: 15px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: #38bdf8;
+            color: #0f172a;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* CONTACT */
+        .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+        .contact-links a {
+            color: #38bdf8;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #38bdf8;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .contact-links a:hover { background: #38bdf8; color: #0f172a; }
+
+        footer { margin-top: 100px; padding: 40px; opacity: 0.5; font-size: 14px; }
+
+        /* Стили для PDF (чтобы фон был темным при сохранении) */
+        .pdf-mode { background: #0f172a !important; color: white !important; }
+    </style>
 </head>
 <body>
 
-  <!-- Canvas background for geometric network -->
-  <canvas id="bg"></canvas>
-
-  <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="#">Portfolio</a>
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a class="nav-link" href="#about" data-scroll>Men haqimda</a></li>
-          <li class="nav-item"><a class="nav-link" href="#interests" data-scroll>Qiziqishlarim</a></li>
-          <li class="nav-item"><a class="nav-link" href="#itpath" data-scroll>IT yo‘nalishim</a></li>
-          <li class="nav-item"><a class="nav-link" href="#works" data-scroll>Ishlarim</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contact" data-scroll>Bog‘lanish</a></li>
-          <li class="nav-item ms-3">
-            <select id="lang" class="form-select form-select-sm lang-select">
-              <option value="uz" selected>UZ</option>
-              <option value="ru">RU</option>
-            </select>
-          </li>
-        </ul>
-      </div>
+    <div class="background">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
     </div>
-  </nav>
 
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="container fade-up">
-      <h2 id="titleAbout">Men haqimda</h2>
-      <p id="textAbout" class="fs-5">
-        Men — <strong>Abdumalik Atajanov</strong>, 2011-yil mart oyida Xiva shahrida tug‘ilganman.
-        Hozirda Orujev nomli 12-son maktabda o‘qiyman.Bunan oldin esa mahallamizdagi Bog'chaga borganman.Yana 4-5 yoshligimda tennis bilan ham shug'lullanganman.
-      </p>
-    </div>
-  </section>
-
-  <!-- INTERESTS -->
-  <section id="interests" class="bg-dark">
-    <div class="container fade-up">
-      <h2 id="titleInterests">Qiziqishlarim</h2>
-      <p id="textInterests">
-        Bo‘sh vaqtimda futbol o‘ynashni yoqtiraman. Bundan tashqari, dasturlash, yangi texnologiyalar va kompyuter tizimlariga katta qiziqishim bor.
-      </p>
-    </div>
-  </section>
-
-  <!-- IT PATH (full text) -->
-  <section id="itpath">
-    <div class="container fade-up">
-      <h2 id="titleIT">IT yo‘nalishim</h2>
-      <p id="textIT">
-        Bolaligimdan kompyuterlar va texnologiyalar meni juda qiziqtirgan. Avval o‘yin o‘ynab, keyinchalik ular qanday ishlashini o‘rganishga harakat qilganman.
-        Shu orqali dasturlashga bo‘lgan qiziqishim yanada kuchaydi. Kichikligimda IT yo‘nalishi O‘zbekistonda hali rivojlanmagan edi.
-        Keyinchalik “Al-Xorazmiy vorislari” loyihasi ochildi va men shu loyihaning o‘quvchisiman.
-        Orzum — professional dasturchi bo‘lish va O‘zbekiston rivojiga o‘z hissamni qo‘shish.
-      </p>
-    </div>
-  </section>
-
-  <!-- WORKS -->
-  <section id="works" class="bg-dark">
-    <div class="container fade-up">
-      <h2 id="titleWorks">Mening ishlarim</h2>
-
-      <div class="row g-4">
-        <!-- Card 1 -->
-        <div class="col-md-4">
-          <div class="card custom-card">
-            <!-- prefers local images/images fallback -->
-            <img
-              src="images/2048.png"
-              alt="2048 Game"
-              onerror="this.onerror=null; this.src='https://picsum.photos/seed/2048/800/450';"
-            />
-            <div class="card-body">
-              <h5 class="card-title">2048 Game</h5>
-              <p class="card-text">
-                HTML, CSS va JavaScript yordamida yaratilgan klassik 2048 o‘yini. Rangli bloklar va chiroyli fon bilan bezatilgan.
-              </p>
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="text-muted">HTML • JS • CSS</small>
-                <a class="btn btn-sm btn-outline-light" href="index2.html" role="button">Ko‘rish</a>
-              </div>
-            </div>
-          </div>
+    <nav>
+        <div class="nav-links">
+            <a href="#about" id="nav-about">Men haqimda</a>
+            <a href="#skills" id="nav-skills">Skills</a>
+            <a href="#projects" id="nav-projects">Projects</a>
         </div>
-
-        <!-- Card 2 -->
-        <div class="col-md-4">
-          <div class="card custom-card">
-            <img
-              src="images/random-image.png"
-              alt="Random Image Generator"
-              onerror="this.onerror=null; this.src='https://picsum.photos/seed/random/800/450';"
-            />
-            <div class="card-body">
-              <h5 class="card-title">Random Image Generator</h5>
-              <p class="card-text">
-                Har safar sahifa yangilanganda tasodifiy rasmni ko‘rsatadigan oddiy veb loyiha — o‘rganish uchun juda yaxshi mashq.
-              </p>
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="text-muted">HTML • JS</small>
-                <a class="btn btn-sm btn-outline-light" href="index3.html" role="button">Demo</a>
-              </div>
+        <div class="controls">
+            <div class="lang">
+                <button onclick="setLang('uz')">UZ</button>
+                <button onclick="setLang('ru')">RU</button>
+                <button onclick="setLang('en')">EN</button>
             </div>
-          </div>
+            <button class="pdf-btn" onclick="downloadPDF()">PDF</button>
         </div>
+    </nav>
 
-        <!-- Card 3 -->
-        <div class="col-md-4">
-          <div class="card custom-card">
-            <img
-              src="images/portfolio-preview.gif"
-              alt="Portfolio"
-              onerror="this.onerror=null; this.src='https://picsum.photos/seed/portfolio/800/450';"
-            />
-            <div class="card-body">
-              <h5 class="card-title">Portfolio Website</h5>
-              <p class="card-text">
-                Bootstrap asosida tayyorlangan shaxsiy sayt — loyihalar va ma’lumotlarni taqdim etish uchun mos. Responsive va oddiy tahrir qilish mumkin.
-              </p>
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="text-muted">Bootstrap • HTML • CSS</small>
-                <a class="btn btn-sm btn-outline-light" href="index4.html" role="button">Manba</a>
-              </div>
+    <div class="container" id="main-content">
+        <header>
+            <h1 id="title">Salom, men Abdumalik</h1>
+            <p id="subtitle">Frontend developer va o'quvchi</p>
+        </header>
+
+        <section id="about">
+            <h2 id="aboutTitle">Men haqimda</h2>
+            <p id="aboutText">
+                Men 2011-yilda Urganch shahrida tug‘ilganman. 3 oyligimda oilamiz bilan Xiva shahriga ko‘chib kelganmiz va hozirgacha shu yerda yashaymiz. Otam va onam meni har doim qo‘llab-quvvatlab kelishadi. Men dasturlash va web sayt yaratishga qiziqaman.
+            </p>
+        </section>
+
+        <section id="skills">
+            <h2 id="skillsTitle">Ko'nikmalar</h2>
+            <div class="skills">
+                <div class="skill">
+                    <span>HTML - 70%</span>
+                    <div class="bar"><div class="progress" style="width: 70%;"></div></div>
+                </div>
+                <div class="skill">
+                    <span>CSS - 60%</span>
+                    <div class="bar"><div class="progress" style="width: 60%;"></div></div>
+                </div>
+                <div class="skill">
+                    <span>JavaScript - 40%</span>
+                    <div class="bar"><div class="progress" style="width: 40%;"></div></div>
+                </div>
+                <div class="skill">
+                    <span>Python - 30%</span>
+                    <div class="bar"><div class="progress" style="width: 30%;"></div></div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
+        </section>
 
+        <section id="projects">
+            <h2 id="projectsTitle">Loyihalar</h2>
+            <div class="projects">
+                <div class="project">
+                    <h3>Todo List App</h3>
+                    <button onclick="window.open('project1.html')">Open</button>
+                </div>
+                <div class="project">
+                    <h3>Calculator</h3>
+                    <button onclick="window.open('project2.html')">Open</button>
+                </div>
+                <div class="project">
+                    <h3>Snake Game</h3>
+                    <button onclick="window.open('project3.html')">Open</button>
+                </div>
+                <div class="project">
+                    <h3>2048 Game</h3>
+                    <button onclick="window.open('project4.html')">Open</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact">
+            <h2 id="contactTitle">Aloqa</h2>
+            <div class="contact-links">
+                <a href="https://t.me/abc7o2">Telegram</a>
+                <a href="https://instagram.com/atajanov_abdumalik">Instagram</a>
+                <a href="mailto:abdumalikatajnov7@gmail.com">Email</a>
+                <a href="https://github.com/Abdumalik702">GitHub</a>
+            </div>
+        </section>
+
+        <footer>
+            © 2026 Abdumalik Atajanov | Portfolio
+        </footer>
     </div>
-  </section>
 
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="container fade-up">
-      <h2 id="titleContact">Bog‘lanish</h2>
-      <p id="textContact">
-        Agar sizda taklif yoki savollar bo‘lsa, bemalol murojaat qiling! Quyida men bilan bog‘lanish uchun manzillar:
-      </p>
-
-      <ul class="list-unstyled">
-        <li>Email: <a id="emailLink" class="text-decoration-none" href="mailto:abdumalikatajanov7@gmail.com">abdumalikatajanov7@gmail.com</a></li>
-        <li>Telegram: <a id="tgLink" class="text-decoration-none" href="https://t.me/abc7o2" target="_blank">@abc7o2</a></li>
-        <li>GitHub: <a id="ghLink" class="text-decoration-none" href="https://github.com/Abdumalik702" target="_blank">github.com/Abdumalik702</a></li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    © <span id="year"></span> Abdumalik Atajanov — Barcha huquqlar himoyalangan.
-  </footer>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Canvas geometric background + animations + UI scripting -->
-  <script>
-    /* ---------- Canvas geometric (calm) background ---------- */
-    (function(){
-      const canvas = document.getElementById('bg');
-      const ctx = canvas.getContext('2d');
-      let w = canvas.width = innerWidth;
-      let h = canvas.height = innerHeight;
-      const POINTS = Math.max(60, Math.floor((w*h)/90000)); // scale with screen
-      const points = [];
-
-      function rand(min,max){ return Math.random()*(max-min)+min; }
-      function resize(){
-        w = canvas.width = innerWidth;
-        h = canvas.height = innerHeight;
-        points.length = 0;
-        for(let i=0;i<POINTS;i++){
-          points.push({
-            x: Math.random()*w,
-            y: Math.random()*h,
-            vx: (Math.random()-0.5)*0.3,
-            vy: (Math.random()-0.5)*0.3
-          });
-        }
-      }
-
-      function draw(){
-        ctx.clearRect(0,0,w,h);
-
-        // subtle background radial gradient
-        const g = ctx.createLinearGradient(0,0,w,h);
-        g.addColorStop(0,'rgba(10,12,14,0.55)');
-        g.addColorStop(1,'rgba(3,6,9,0.75)');
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,w,h);
-
-        // draw connections
-        for(let i=0;i<points.length;i++){
-          const p = points[i];
-          p.x += p.vx; p.y += p.vy;
-          if(p.x<0 || p.x>w) p.vx *= -1;
-          if(p.y<0 || p.y>h) p.vy *= -1;
-
-          // point
-          ctx.beginPath();
-          ctx.arc(p.x,p.y,1.2,0,Math.PI*2);
-          ctx.fillStyle = 'rgba(0,188,212,0.9)';
-          ctx.fill();
-
-          // connections
-          for(let j=i+1;j<points.length;j++){
-            const q = points[j];
-            const dx = p.x-q.x, dy = p.y-q.y;
-            const dist = Math.sqrt(dx*dx+dy*dy);
-            if(dist < 140){
-              ctx.strokeStyle = 'rgba(0,188,212,' + (0.14*(1 - dist/140)) + ')';
-              ctx.lineWidth = 0.6;
-              ctx.beginPath();
-              ctx.moveTo(p.x,p.y);
-              ctx.lineTo(q.x,q.y);
-              ctx.stroke();
+    <script>
+        const translations = {
+            uz: {
+                navAbout: "Men haqimda", navSkills: "Skills", navProjects: "Loyihalar",
+                title: "Salom, men Abdumalik", subtitle: "Frontend developer va o'quvchi",
+                aboutTitle: "Men haqimda", aboutText: "Men 2011-yilda Urganch shahrida tug‘ilganman. 3 oyligimda oilamiz bilan Xiva shahriga ko‘chib kelganmiz va hozirgacha shu yerda yashaymiz. Otam va onam meni har doim qo‘llab-quvvatlab kelishadi. Men dasturlash va web sayt yaratishga qiziqaman.",
+                skillsTitle: "Ko'nikmalar", projectsTitle: "Loyihalar", contactTitle: "Aloqa"
+            },
+            ru: {
+                navAbout: "Обо мне", navSkills: "Навыки", navProjects: "Проекты",
+                title: "Привет, я Абдумалик", subtitle: "Frontend разработчик и ученик",
+                aboutTitle: "Обо мне", aboutText: "Я родился в 2011 году в Ургенче. В возрасте 3 месяцев мы с семьей переехали в Хиву, где живем до сих пор. Родители всегда поддерживают меня. Я увлекаюсь программированием и созданием веб-сайтов.",
+                skillsTitle: "Навыки", projectsTitle: "Проекты", contactTitle: "Контакты"
+            },
+            en: {
+                navAbout: "About Me", navSkills: "Skills", navProjects: "Projects",
+                title: "Hello, I'm Abdumalik", subtitle: "Frontend Developer & Student",
+                aboutTitle: "About Me", aboutText: "I was born in 2011 in Urgench. At 3 months old, my family moved to Khiva, where we still live. My parents always support me. I am passionate about programming and web development.",
+                skillsTitle: "Skills", projectsTitle: "Projects", contactTitle: "Contact"
             }
-          }
+        };
+
+        function setLang(lang) {
+            const t = translations[lang];
+            document.getElementById("nav-about").innerText = t.navAbout;
+            document.getElementById("nav-skills").innerText = t.navSkills;
+            document.getElementById("nav-projects").innerText = t.navProjects;
+            document.getElementById("title").innerText = t.title;
+            document.getElementById("subtitle").innerText = t.subtitle;
+            document.getElementById("aboutTitle").innerText = t.aboutTitle;
+            document.getElementById("aboutText").innerText = t.aboutText;
+            document.getElementById("skillsTitle").innerText = t.skillsTitle;
+            document.getElementById("projectsTitle").innerText = t.projectsTitle;
+            document.getElementById("contactTitle").innerText = t.contactTitle;
         }
 
-        requestAnimationFrame(draw);
-      }
-
-      addEventListener('resize', resize);
-      resize();
-      draw();
-    })();
-
-    /* ---------- fade-up reveal on scroll ---------- */
-    (function(){
-      const items = document.querySelectorAll('.fade-up');
-      const io = new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-          if(e.isIntersecting) e.target.classList.add('visible');
-        });
-      }, { threshold: 0.18 });
-      items.forEach(i=>io.observe(i));
-    })();
-
-    /* ---------- small helper: anchor smooth scroll ---------- */
-    (function(){
-      document.querySelectorAll('a[href^="#"], [data-scroll]').forEach(link=>{
-        link.addEventListener('click', function(e){
-          const href = this.getAttribute('href') || this.dataset.href || this.getAttribute('data-href');
-          if(!href || !href.startsWith('#')) return;
-          e.preventDefault();
-          const el = document.querySelector(href);
-          if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-        });
-      });
-    })();
-
-    /* ---------- language toggle (UZ <-> RU) ---------- */
-    (function(){
-      const langSelect = document.getElementById('lang');
-
-      const TEXT = {
-        uz: {
-          titleAbout: 'Men haqimda',
-          textAbout: "Men — Abdumalik Atajanov, 2011-yil mart oyida Xiva shahrida tug‘ilganman. Hozirda Orujev nomli 12-son maktabda o‘qiyman. Otam — Mirzobek Atajanov (28.02.1984), onam — Habibullayeva Muyassar (01.09.1985). Ular meni sabr, mehnatsevarlik va mas’uliyat ruhida tarbiyalashgan.",
-          titleInterests: "Qiziqishlarim",
-          textInterests: "Bo‘sh vaqtimda futbol o‘ynashni yoqtiraman. Bundan tashqari, dasturlash, yangi texnologiyalar va kompyuter tizimlariga katta qiziqishim bor.",
-          titleIT: "IT yo‘nalishim",
-          textIT: "Bolaligimdan kompyuterlar va texnologiyalar meni juda qiziqtirgan. Avval o‘yin o‘ynab, keyinchalik ular qanday ishlashini o‘rganishga harakat qilganman. Shu orqali dasturlashga bo‘lgan qiziqishim yanada kuchaydi. Kichikligimda IT yo‘nalishi O‘zbekistonda hali rivojlanmagan edi. Keyinchalik “Al-Xorazmiy vorislari” loyihasi ochildi va men shu loyihaning o‘quvchisiman. Orzum — professional dasturchi bo‘lish va O‘zbekiston rivojiga o‘z hissamni qo‘shish.",
-          titleWorks: "Mening ishlarim",
-          // project texts reuse card content already present
-          titleContact: "Bog‘lanish",
-          textContact: "Agar sizda taklif yoki savollar bo‘lsa, bemalol murojaat qiling!"
-        },
-        ru: {
-          titleAbout: 'Обо мне',
-          textAbout: "Я — Абдумалик Атажанов, родился в марте 2011 года в Хиве. Сейчас учусь в школе №12 имени Оrujev. Мои родители — Мирзобек Атажанов (28.02.1984) и Хабибуллаева Муюссар (01.09.1985). Они воспитали во мне терпение, трудолюбие и ответственность.",
-          titleInterests: "Мои интересы",
-          textInterests: "В свободное время люблю играть в футбол. Также увлекаюсь программированием, новыми технологиями и компьютерами.",
-          titleIT: "Мой путь в IT",
-          textIT: "С ранних лет меня сильно привлекали компьютеры и технологии. Сначала я играл в игры, затем стал пытаться понять, как они работают — это разожгло интерес к программированию. В детстве направление IT в Узбекистане развивалось слабо. Позже открылся проект «Наследники аль-Хорезми» (Al-Xorazmiy vorislari), в котором я являюсь учеником. Моя цель — стать профессиональным программистом и внести вклад в развитие Узбекистана.",
-          titleWorks: "Мои работы",
-          titleContact: "Контакты",
-          textContact: "Если у вас есть предложения или вопросы — пишите!"
+        function downloadPDF() {
+            const element = document.getElementById('main-content');
+            const opt = {
+                margin: 10,
+                filename: 'Abdumalik_Portfolio.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#0f172a' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
-      };
-
-      function applyLang(key){
-        const t = TEXT[key];
-        document.getElementById('titleAbout').textContent = t.titleAbout;
-        document.getElementById('textAbout').textContent = t.textAbout;
-        document.getElementById('titleInterests').textContent = t.titleInterests;
-        document.getElementById('textInterests').textContent = t.textInterests;
-        document.getElementById('titleIT').textContent = t.titleIT;
-        document.getElementById('textIT').textContent = t.textIT;
-        document.getElementById('titleWorks').textContent = t.titleWorks;
-        document.getElementById('titleContact').textContent = t.titleContact;
-        document.getElementById('textContact').textContent = t.textContact;
-        // update html lang attribute
-        document.documentElement.lang = (key === 'uz' ? 'uz' : 'ru');
-      }
-
-      langSelect.addEventListener('change', function(){
-        applyLang(this.value);
-      });
-
-      // initial apply
-      applyLang(langSelect.value);
-    })();
-
-    /* ---------- set current year in footer ---------- */
-    (function(){ document.getElementById('year').textContent = new Date().getFullYear(); })();
-
-  </script>
+    </script>
 </body>
 </html>
